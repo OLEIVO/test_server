@@ -1,0 +1,4 @@
+{
+  "presets": ["node7"],
+  "plugins": ["syntax-async-functions", "add-module-exports", "transform-decorators-legacy", "transform-function-bind"]
+}
