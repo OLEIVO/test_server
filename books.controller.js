@@ -1,6 +1,6 @@
 import Controller from './controller';
 import {dbConnect} from './db';
-import {sorted} from './utils';
+import {getValuesByUpdate, getValuesByInsert} from './utils';
 
 export default class BooksController extends Controller {
 
@@ -9,10 +9,8 @@ export default class BooksController extends Controller {
      * @type {Function}
      */
     getBooks = dbConnect(async (conn, ctx) => {
-
-        const {sort, group} = ctx.query;
-
-        const SQL = `select * from books ${group} ${sort} limit ${this.limit} offset ${ctx.query.offset || this.offset}`;
+        const {sort} = ctx.query;
+        const SQL = `select * from books ${sort} limit ${this.limit} offset ${ctx.query.offset || this.offset}`;
         ctx.body = await conn.query(SQL);
     });
 
@@ -21,10 +19,9 @@ export default class BooksController extends Controller {
      * @type {Function}
      */
     addBook = dbConnect(async (conn, ctx) => {
-        const {book_title, book_date, book_author, book_desc} = ctx.request.body;
-        const SQL = `insert into books (book_title, book_date, book_autor, book_desc) values ("${book_title}", "${book_date}", "${book_author}", "${book_desc}")`;
+        const SQL = `insert into books ${getValuesByInsert(ctx.request.body)}`;
         await conn.query(SQL);
-        ctx.status = 201; // Создаем запись
+        ctx.status = 201;
     });
 
     /**
@@ -32,10 +29,9 @@ export default class BooksController extends Controller {
      * @type {Function}
      */
     putBook = dbConnect(async (conn, ctx) => {
-        const {book_title, book_date, book_author, book_desc} = ctx.request.body;
-        const SQL = `update books set book_title = "${book_title}", book_date = "${book_date}", book_autor = "${book_author}", book_desc = "${book_desc}" where id = ${ctx.params.id}`;
+        const SQL = `update books set ${getValuesByUpdate(ctx.request.body)} where id = ${ctx.params.id}`;
         await conn.query(SQL);
-        ctx.status = 204; // Не возвращаем контент
+        ctx.status = 204;
     });
 
     validate = async (ctx, next) => {

@@ -4,7 +4,7 @@ create table books
   id int(11) NOT NULL AUTO_INCREMENT,
   book_title varchar(128) not null,
   book_date  date         null,
-  book_autor varchar(64)  not null,
+  book_author varchar(64)  not null,
   book_desc  varchar(255) null,
   book_image blob         null,
   UNIQUE KEY books_id (id, book_date)
