@@ -1,5 +1,6 @@
 import Controller from './controller';
 import {dbConnect} from './db';
+import _ from 'lodash';
 import {getValuesByUpdate, getValuesByInsert} from './utils';
 
 export default class BooksController extends Controller {
@@ -28,10 +29,26 @@ export default class BooksController extends Controller {
      * Изменение книги
      * @type {Function}
      */
-    putBook = dbConnect(async (conn, ctx) => {
+    patchBook = dbConnect(async (conn, ctx) => {
         const SQL = `update books set ${getValuesByUpdate(ctx.request.body)} where id = ${ctx.params.id}`;
         await conn.query(SQL);
         ctx.status = 204;
+    });
+
+    puthBook = dbConnect(async (conn, ctx) => {
+        let data = await conn.query('select * from books where id = ' + ctx.params.id);
+        if (data) {
+            data = _.defaults(ctx.request.body, data[0]);
+            delete data.id;
+
+            await Promise.all([
+                conn.query('delete from books where id = ' + ctx.params.id),
+                conn.query(`insert into books ${getValuesByInsert(data)}`),
+            ]);
+            ctx.status = 204;
+        } else {
+            ctx.status = 404;
+        }
     });
 
     validate = async (ctx, next) => {

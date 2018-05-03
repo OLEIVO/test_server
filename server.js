@@ -30,7 +30,8 @@ const optionsCache = {
 router
     .get('/books', booksController.getBooks)
     .post('/books', booksController.validate, booksController.addBook)
-    .put('/books/:id', booksController.validate, booksController.putBook);
+    .put('/books/:id', booksController.validate, booksController.puthBook)
+    .patch('/books/:id', booksController.validate, booksController.patchBook);
 
 koaQS(app, 'strict');
 
